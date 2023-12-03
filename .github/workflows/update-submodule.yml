@@ -1,0 +1,30 @@
+name: Update Submodule
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'creatoroid/test'
+          token: ${{ secrets.ACCESS_TOKEN }}
+          path: 'test'
+
+      - name: Update submodule reference to latest commit from docs
+        run: |
+          cd test
+          git submodule update --init --recursive
+          git submodule set-branch --branch main doctest
+          git submodule update --remote
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add docs 
+          git commit -m "Update doctest submodule to latest commit"
+          git push
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
