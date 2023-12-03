@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'creatoroid/test'
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: 'test'
 
       - name: Update submodule reference to latest commit from docs
@@ -27,4 +27,4 @@ jobs:
           git commit -m "Update doctest submodule to latest commit"
           git push
         env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
