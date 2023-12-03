@@ -13,7 +13,7 @@ jobs:
         with:
           repository: 'creatoroid/test'
           ref: 'main'
-          # token: ${{ secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN}}
 
       - name: Update submodule reference to latest commit from docs
         run: |
