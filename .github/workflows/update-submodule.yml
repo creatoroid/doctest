@@ -12,7 +12,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'creatoroid/test'
-          token: ${{ secrets.GITHUB_TOKEN }}
           path: 'test'
 
       - name: Update submodule reference to latest commit from docs
@@ -28,3 +27,84 @@ jobs:
           git push
         env:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# name: Update Submodule
+
+# on:
+#   push:
+#     branches:
+#       - main  # Triggers on push to the main branch
+
+#   workflow_dispatch:  # Allows you to run this workflow manually from the Actions tab
+
+# permissions:  # Explicitly set permissions for the token
+#   contents: write
+#   id-token: write
+
+# concurrency:  # Ensure only one instance of the workflow runs at a time
+#   group: "update-submodule-${{ github.ref }}"
+#   cancel-in-progress: true
+
+# jobs:
+#   update-submodule:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout submodule repository
+#       uses: actions/checkout@v3
+#       with:
+#         repository: 'creatoroid/doctest'
+#         ref: 'main'
+#         token: ${{ secrets.SUBMODULE_REPO_TOKEN }}  # Assuming a token is required for submodule repo access
+
+#     - name: Checkout code repository
+#       uses: actions/checkout@v3
+#       with:
+#         repository: 'creatoroid/creatoroid'
+#         token: ${{ secrets.PARENT_REPO_TOKEN }} 
+#         path: 'code-repo'
+
+#     - name: Update submodule reference
+#       run: |
+#         cd code-repo
+#         git submodule update --remote --merge docs
+#         git commit -am "Update submodule reference to latest commit"
+#         git push
+#       env:
+#         GIT_COMMITTER_NAME: ${{ secrets.GIT_COMMITTER_NAME }}  # Use secrets to protect personal information
+#         GIT_COMMITTER_EMAIL: ${{ secrets.GIT_COMMITTER_EMAIL }}
+
+# name: Update Submodule
+
+# on:
+#   push:
+#     branches:
+#       - main  # or the branch that you want to trigger the update
+
+# jobs:
+#   update-submodule:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout submodule repository
+#       uses: actions/checkout@v3
+#       with:
+#         repository: 'creatoroid/doctest'
+#         ref: 'main'  # or the branch you're pushing to
+
+#     - name: Checkout code repository
+#       uses: actions/checkout@v3
+#       with:
+#         repository: 'creatoroid/creatoroid'
+#         token: ${{ secrets.PARENT_REPO_TOKEN }} 
+#         path: 'code-repo'
+
+#     - name: Update submodule reference
+#       run: |
+#         cd code-repo
+#         git submodule update --remote --merge docs
+#         git commit -am "Update submodule reference to latest commit"
+#         git push
+#       env:
+#         GIT_COMMITTER_NAME: 'Your Name'
+#         GIT_COMMITTER_EMAIL: 'your-email@example.com'
