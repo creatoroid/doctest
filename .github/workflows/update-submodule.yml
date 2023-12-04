@@ -138,7 +138,8 @@ jobs:
       - name: Update submodule reference
         run: |
           cd docs
-          git pull origin main
+          git fetch
+          git checkout main
           cd ..
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git config --global user.name 'github-actions[bot]'
