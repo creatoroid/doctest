@@ -32,41 +32,36 @@
 
 name: Update Submodule
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
-  update-submodule:
-    runs-on: ubuntu-latest 
-    steps:
-      - name: Setup Git Config
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+  update:
+    runs-on: ubuntu-latest
 
-      - name: Clone Code Repository and Update Submodule
+    steps:
+      - name: Checkout code repository 
+        uses: actions/checkout@v2
+        with:
+          repository: 'creatoroid/test'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch all git history
+        run: git fetch --prune --unshallow
+
+      - name: Update submodule reference
         run: |
-          git clone https://github.com/creatoroid/test.git
-          cd test/docs
-          git pull
-          git submodule update --recursive
+          cd docs
+          git pull origin main
           cd ..
-          git checkout -b synch-docs-submodule
-          git add .
-          git commit -m "Synchronize docs submodule to latest commit"
-          git push origin synch-docs-submodule
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'github-actions[bot]'
+          git commit -am "Update docs submodule reference to latest commit"
+          git push
 
       - name: Create Pull Request
-        uses: repo-sync/pull-request@v2
+        uses: peter-evans/create-pull-request@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: "synch-docs-submodule"
-          destination_branch: "main"
-          pr_title: "Synchronize Docs Submodule"
-          pr_body: "This PR synchronize the Docs submodule to the latest commit."
-
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Update docs submodule reference"
+          body: "This PR updates the docs submodule reference to the latest commit."
+          branch: "update-docs-submodule"
