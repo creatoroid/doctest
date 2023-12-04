@@ -9,7 +9,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Main Checkout code repository
+      - name: Checkout code repository
         uses: actions/checkout@v2
         with:
           repository: 'creatoroid/test'
@@ -19,32 +19,23 @@ jobs:
       - name: Create new branch for submodule update
         run: |
           git checkout -b sync-docs-submodule
-
-      - name: Update submodule reference
-        run: |
           git submodule update --init --recursive
           git submodule foreach git pull origin main
-          
-          # Configure git user and email for commit purposes
+
+      - name: Commit submodule reference
+        run: |
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
-          
-          # Commit the submodule changes
           git commit -am "Update submodule reference"
-
-      # Push the changes to the new branch
-      - name: Push changes to new branch
-        run: git push origin sync-docs-submodule
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Create Pull Request
-      - name: Open a pull request
-        uses: repo-sync/pull-request@v2
+          
+      # The new action to create a fork, push to the fork and then create a pull request
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
         with:
-          source_branch: "sync-docs-submodule"
-          destination_branch: "main"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "Update submodule reference"
-          pr_body: "This PR updates the submodule references to the latest commit on the main branch."
-          pr_label: "automated-pr"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          push-to-fork: 'github-actions[bot]'
+          branch: 'sync-docs-submodule'
+          delete-branch: true
+          title: "Update submodule reference"
+          body: "This PR updates the submodule references to the latest commit on the main branch."
+          labels: "automated-pr"
