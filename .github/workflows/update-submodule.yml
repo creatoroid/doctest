@@ -1,29 +1,67 @@
+# name: Update Submodule
+# on:
+#   push:
+#     branches:
+#       - main 
+
+# jobs:
+#   update-submodule:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code repository
+#         uses: actions/checkout@v3
+#         with:
+#           repository: 'creatoroid/test'
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           path: 'test'
+
+#       - name: Update submodule reference to latest commit from docs
+#         run: |
+#           cd test
+#           git submodule update --init --recursive
+#           git submodule set-branch --branch main doctest
+#           git submodule update --remote
+#           git config user.email 'github-actions[bot]@users.noreply.github.com'
+#           git config user.name 'github-actions[bot]'
+#           git add docs 
+#           git commit -m "Update doctest submodule to latest commit"
+#           git push
+#         env:
+#           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+
 name: Update Submodule
-on:
-  push:
-    branches:
-      - main 
+
+on: [push, pull_request]
 
 jobs:
-  update-submodule:
+  update:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code repository
-        uses: actions/checkout@v3
+      - name: Checkout code repository 
+        uses: actions/checkout@v2
         with:
           repository: 'creatoroid/test'
-          path: 'test'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update submodule reference to latest commit from docs
+      - name: Fetch all git history
+        run: git fetch --prune --unshallow
+
+      - name: Update submodule reference
         run: |
-          cd test
-          git submodule update --init --recursive
-          git submodule set-branch --branch main doctest
-          git submodule update --remote
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git config user.name 'github-actions[bot]'
-          git add docs 
-          git commit -m "Update doctest submodule to latest commit"
+          cd docs
+          git pull origin main
+          cd ..
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'github-actions[bot]'
+          git commit -am "Update docs submodule reference to latest commit"
           git push
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Update docs submodule reference"
+          body: "This PR updates the docs submodule reference to the latest commit."
+          branch: "update-docs-submodule"
