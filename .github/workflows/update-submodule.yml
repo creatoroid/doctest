@@ -132,12 +132,9 @@ jobs:
           repository: 'creatoroid/test'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch all git history
-        run: git fetch --prune --unshallow
-
       - name: Update submodule reference
         run: |
-          cd docs
+          cd test/docs
           git fetch
           git checkout main
           cd ..
