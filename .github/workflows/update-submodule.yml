@@ -1,3 +1,4 @@
+name: Update Submodule
 on:
   push:
     branches:
@@ -5,20 +6,21 @@ on:
 
 jobs:
   update:
-    
     runs-on: ubuntu-latest
 
-    env:
-      # Use the GITHUB_TOKEN provided by Actions
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
       - name: Main Checkout code repository
         uses: actions/checkout@v2
         with:
           repository: 'creatoroid/test'
           ref: 'main'
           fetch-depth: 0 # Fetch all history for all tags and branches
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Main Update submodule reference
         run: |
