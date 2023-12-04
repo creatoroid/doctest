@@ -9,10 +9,11 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-
-      - name: Create new branch for submodule update
+      - name: Checkout code repository
         run: |
           git clone https://github.com/creatoroid/test
+      - name: Create new branch for submodule update
+        run: |
           cd test
           git checkout -b sync-docs-submodule
           git submodule update --init --recursive
@@ -20,8 +21,8 @@ jobs:
 
       - name: Commit submodule reference
         run: |
-          git config user.email 'hhh'
-          git config user.name 'kkk'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
           git commit -am "Update submodule reference"
 
       - name: Push changes to new branch
