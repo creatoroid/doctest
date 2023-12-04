@@ -32,36 +32,39 @@
 
 name: Update Submodule
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  update:
+  update-submodule:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code repository 
-        uses: actions/checkout@v2
-        with:
-          repository: 'creatoroid/test'
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Fetch all git history
-        run: git fetch --prune --unshallow
-
-      - name: Update submodule reference
+      - name: Setup Git Config
         run: |
-          cd docs
-          git pull origin main
-          cd ..
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git config --global user.name 'github-actions[bot]'
-          git commit -am "Update docs submodule reference to latest commit"
-          git push
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Clone Code Repository and Update Submodule
+        run: |
+          git clone https://github.com/creatoroid/test.git
+          cd test
+          git submodule update --remote --merge
+          git checkout -b new-branch-for-pr
+          git add .
+          git commit -m "Update docs submodule to latest commit"
+          git push origin new-branch-for-pr
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: repo-sync/pull-request@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Update docs submodule reference"
-          body: "This PR updates the docs submodule reference to the latest commit."
-          branch: "update-docs-submodule"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: "new-branch-for-pr"
+          destination_branch: "main"
+          pr_title: "Update Docs Submodule"
+          pr_body: "This PR updates the Docs submodule to the latest commit."
+
