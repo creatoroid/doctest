@@ -1,3 +1,5 @@
+name: Update Submodule
+
 on:
   push:
     branches:
@@ -14,7 +16,11 @@ jobs:
           ref: 'main'
           fetch-depth: 0 # Fetch all history for all tags and branches
 
-      - name: Main Update submodule reference
+      - name: Create new branch for submodule update
+        run: |
+          git checkout -b sync-docs-submodule
+
+      - name: Update submodule reference
         run: |
           git submodule update --init --recursive
           git submodule foreach git pull origin main
@@ -25,9 +31,20 @@ jobs:
           
           # Commit the submodule changes
           git commit -am "Update submodule reference"
-          
-          # Push the changes back to the original repository
-          git push origin main
+
+      # Push the changes to the new branch
+      - name: Push changes to new branch
+        run: git push origin sync-docs-submodule
         env:
-          # Use the GITHUB_TOKEN provided by Actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Create Pull Request
+      - name: Open a pull request
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: "sync-docs-submodule"
+          destination_branch: "main"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "Update submodule reference"
+          pr_body: "This PR updates the submodule references to the latest commit on the main branch."
+          pr_label: "automated-pr"
