@@ -52,19 +52,21 @@ jobs:
       - name: Clone Code Repository and Update Submodule
         run: |
           git clone https://github.com/creatoroid/test.git
-          cd test
-          git submodule update --remote --merge
-          git checkout -b new-branch-for-pr
+          cd test/docs
+          git pull
+          git submodule update --recursive
+          cd ..
+          git checkout -b synch-docs-submodule
           git add .
-          git commit -m "Update docs submodule to latest commit"
-          git push origin new-branch-for-pr
+          git commit -m "Synchronize docs submodule to latest commit"
+          git push origin synch-docs-submodule
 
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: "new-branch-for-pr"
+          source_branch: "synch-docs-submodule"
           destination_branch: "main"
-          pr_title: "Update Docs Submodule"
-          pr_body: "This PR updates the Docs submodule to the latest commit."
+          pr_title: "Synchronize Docs Submodule"
+          pr_body: "This PR synchronize the Docs submodule to the latest commit."
 
