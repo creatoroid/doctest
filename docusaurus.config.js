@@ -9,8 +9,8 @@ const projectName = "doctest";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "SynchroDroning",
-  tagline: "Robots are cool.",
+  title: "Test Website",
+  tagline: "AI is coming.",
   url: `https://${organizationName}.github.io`,
   baseUrl: `/${projectName}/`,
   onBrokenLinks: "throw",
